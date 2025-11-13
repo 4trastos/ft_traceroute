@@ -17,35 +17,37 @@
 # include <sys/time.h>
 
 
+extern volatile sig_atomic_t g_sigint_received;
+
 //*** Init Functions ***/
 
 int         main(int argc, char **argv);
 
 //*** Parser Logic***/
 
-void        init_struct(struct config *conf);
-void        show_help(void);
-int         ft_parser(struct config *conf, char **argv, int argc);
+// void        init_struct(struct config *conf);
+// void        show_help(void);
+// int         ft_parser(struct config *conf, char **argv, int argc);
 
 //*** Signal Handler ***/
 
 void        sigint_handler(int signum);
-void        sigalrm_handler(int signum);
 void        init_signal(void);
+//void        sigalrm_handler(int signum);
 
 //*** Ping Logic ***/
 
-int         dns_resolution(struct config *conf);
-int         socket_creation(struct config *conf);
-int         icmp_creation(struct config *conf);
-uint16_t    calculate_checksum(void *packet, size_t len);
-int         send_socket(struct config *conf);
-int         receive_response(struct config *conf);
-double      calculate_rtt(struct ping_packet *sent_packet);
+// int         dns_resolution(struct config *conf);
+// int         socket_creation(struct config *conf);
+// int         icmp_creation(struct config *conf);
+// uint16_t    calculate_checksum(void *packet, size_t len);
+// int         send_socket(struct config *conf);
+// int         receive_response(struct config *conf);
+// double      calculate_rtt(struct ping_packet *sent_packet);
 
 //*** Statistics ***/
 
-void        show_statistics(struct config *conf);
-void        printf_verbose(struct config *conf);
+// void        show_statistics(struct config *conf);
+// void        printf_verbose(struct config *conf);
 
 #endif
