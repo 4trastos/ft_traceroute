@@ -19,6 +19,12 @@
 
 extern volatile sig_atomic_t g_sigint_received;
 
+struct config
+{
+    bool    verbose_mode;
+    bool    
+};
+
 //*** Init Functions ***/
 
 int         main(int argc, char **argv);
@@ -27,7 +33,7 @@ int         main(int argc, char **argv);
 
 // void        init_struct(struct config *conf);
 // void        show_help(void);
-// int         ft_parser(struct config *conf, char **argv, int argc);
+int         ft_parser(struct config *conf, char **argv, int argc);
 
 //*** Signal Handler ***/
 

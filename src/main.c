@@ -4,6 +4,7 @@ volatile sig_atomic_t g_sigint_received = 0;
 
 int main(int argc, char **argv)
 {
+    struct config   *conf;
     int exit = 0;
 
     if (argc < 2)
@@ -11,6 +12,14 @@ int main(int argc, char **argv)
         printf("%s: usage error: Destination address required \n", argv[0]);
         return (1);
     }
+    conf = malloc(sizeof(struct config));
+    if (!conf)
+        return (1);
 
+    init_signal();
+    if (ft_parser(conf, argv, argc) == -1)
+        exit = 1;
+
+    free(conf);
     return (0);
 }
