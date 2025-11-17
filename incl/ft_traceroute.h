@@ -15,14 +15,43 @@
 # include <netinet/ip.h>
 # include <netinet/ip_icmp.h>
 # include <sys/time.h>
+# include <math.h>
 
+# define MAX_PACKETS 1024
+# define ICMP_PAYLOAD_SIZE 56
 
 extern volatile sig_atomic_t g_sigint_received;
 
+struct stats
+{
+    int                 send_packets;
+    int                 recieved_packets;
+    double              min_rtt;
+    double              max_rtt;
+    double              total_rtt;
+    double              total_rtt_sq;
+    struct timeval      start_time;
+};
+
+struct ping_packet
+{
+    struct icmphdr      icmp_header;
+    struct timeval      timestamp; 
+    char                data[ICMP_PAYLOAD_SIZE];
+};
+
 struct config
 {
-    bool    verbose_mode;
-    bool    
+    bool                verbose_mode;
+    bool                show_help;
+    bool                is_valid;
+    char                *hostname;
+    int                 sockfd;
+    int                 ttl;
+    uint16_t            sequence;
+    struct in_addr      ip_address;
+    struct stats        stats;
+    struct ping_packet  packets[MAX_PACKETS]; 
 };
 
 //*** Init Functions ***/
@@ -31,7 +60,7 @@ int         main(int argc, char **argv);
 
 //*** Parser Logic***/
 
-// void        init_struct(struct config *conf);
+void        init_struct(struct config *conf);
 // void        show_help(void);
 int         ft_parser(struct config *conf, char **argv, int argc);
 
