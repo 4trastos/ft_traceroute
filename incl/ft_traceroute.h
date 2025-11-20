@@ -19,6 +19,7 @@
 
 # define MAX_PACKETS 1024
 # define ICMP_PAYLOAD_SIZE 56
+# define MAX_TTL 30
 
 extern volatile sig_atomic_t g_sigint_received;
 
@@ -26,6 +27,7 @@ struct stats
 {
     int                 send_packets;
     int                 recieved_packets;
+    int                 total_ttl;
     double              min_rtt;
     double              max_rtt;
     double              total_rtt;
@@ -42,9 +44,10 @@ struct ping_packet
 
 struct config
 {
-    bool                verbose_mode;
+    bool                show_version;
     bool                show_help;
     bool                is_valid;
+    bool                max_ttl;
     char                *hostname;
     int                 sockfd;
     int                 ttl;
@@ -58,10 +61,17 @@ struct config
 
 int         main(int argc, char **argv);
 
+//*** Auxliar Functions ***/
+
+int         ft_strcmp(const char *s1, const char *s2);
+int         ft_atoi(char *str);
+
 //*** Parser Logic***/
 
 void        init_struct(struct config *conf);
-// void        show_help(void);
+void        show_options(struct config *conf);
+void        show_help(void);
+void        show_version(void);
 int         ft_parser(struct config *conf, char **argv, int argc);
 
 //*** Signal Handler ***/

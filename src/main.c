@@ -19,7 +19,13 @@ int main(int argc, char **argv)
     init_signal();
     if (ft_parser(conf, argv, argc) == -1)
         exit = 1;
+    if (conf->is_valid && (conf->show_help || conf->show_version))
+    {
+        show_options(conf);
+        exit = 0;
+    }
 
+    printf("Hostname: ( %s )\n", conf->hostname);
     free(conf);
-    return (0);
+    return (exit);
 }

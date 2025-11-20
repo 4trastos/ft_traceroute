@@ -4,7 +4,8 @@ CFLAGS = -Wall -Wextra -Werror -g -Iincl
 DLFLAGS = -lm
 RM = rm -f
 
-SRC = src/main.c src/parser.c src/signal_handler.c src/socket.c src/send_reply.c src/request.c
+SRC = src/main.c src/parser.c src/signal_handler.c src/socket.c src/send_reply.c src/request.c \
+	lib/aux.c src/show_options.c
 
 OBTS = $(SRC:.c=.o)
 
@@ -16,7 +17,8 @@ $(NAME): $(OBTS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-clean: $(RM) $(OBTS)
+clean:
+	$(RM) $(OBTS)
 
 fclean: clean
 	$(RM) $(NAME)
