@@ -76,6 +76,7 @@ void        show_options(struct config *conf);
 void        show_help(void);
 void        show_version(void);
 int         ft_parser(struct config *conf, char **argv, int argc);
+int         parser_max_ttl(char **argv, int i, int x);
 
 //*** Signal Handler ***/
 

@@ -17,7 +17,7 @@ int main(int argc, char **argv)
         return (1);
 
     init_signal();
-    if (ft_parser(conf, argv, argc) == -1)
+    if (ft_parser(conf, argv, argc) != 0)
         exit = 1;
     if (conf->is_valid && (conf->show_help || conf->show_version))
     {

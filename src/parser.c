@@ -41,8 +41,8 @@ int ft_parser(struct config *conf, char **argv, int argc)
                 x = i;
                 if (argv[i + 1] == NULL || (ft_atoi(argv[i + 1]) == 0))
                 {
-                    printf("Option `-m' (argc %d) requires an argument: `-m max_ttl'\n", x);
-                    return (-1);
+                    if (parser_max_ttl(argv, i, x) == -1)
+                        return (-1);
                 }
                 conf->max_ttl = false;
             }
