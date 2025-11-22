@@ -220,3 +220,103 @@ Repetir ciclo hasta max_hops o destino
 * **ICMP recibido**: diferencia entre **Time Exceeded** (router intermedio) y **Echo Reply** (destino alcanzado).
 
 ---
+
+# ✅ **Los 5 bonus más fáciles para ft_traceroute**
+
+## **1. DNS Management (MOST EASY)**
+
+**¿Qué es?**
+Hacer reverse DNS para cada salto usando `getnameinfo`, y mostrar “hostname (IP)” en vez de solo la IP.
+
+**Por qué es fácil:**
+
+* Ya tienes la IP de cada salto.
+* `getnameinfo()` ya está autorizado.
+* No rompe nada si falla → simplemente muestras la IP.
+
+**Dificultad:** ⭐
+
+---
+
+## **2. Flag `-m <max_ttl>` → Cambiar TTL máximo**
+
+**¿Qué es?**
+Permitir que el usuario elija el máximo número de saltos, igual que `traceroute -m 20`.
+
+**Por qué es fácil:**
+
+* El bucle TTL ya existe.
+* Solo cambias el límite (por defecto es 30).
+* No requiere modificar sockets ni lógica compleja.
+
+**Dificultad:** ⭐
+
+---
+
+## **3. Flag `-q <nprobes>` → Número de probes por salto**
+
+**¿Qué es?**
+Permitir elegir cuántos “intentos” harás por TTL (por defecto 3).
+
+**Por qué es fácil:**
+
+* Ya tienes un bucle interno que envía 3 paquetes.
+* Solo haces ese valor configurable.
+* Cambiar 3 → variable.
+
+**Dificultad:** ⭐⭐
+
+---
+
+## **4. Flag `-i <interval>` → Intervalo entre envíos**
+
+**¿Qué es?**
+Esperar X milisegundos entre probes.
+
+**Por qué es fácil:**
+
+* Solo introduces un `usleep()` o `nanosleep()`.
+* No afecta a la lógica del socket.
+* Muy simple a nivel de implementación.
+
+**Dificultad:** ⭐⭐
+
+---
+
+## **5. Flag `-t <timeout_ms>` → Timeout para recvfrom**
+
+**¿Qué es?**
+Permitir cambiar el timeout de espera de respuesta por salto.
+
+**Por qué es fácil:**
+
+* Ya estás usando `select()` para timeout.
+* Cambias el valor fijo → variable.
+* Muy básico y no cambia la estructura.
+
+**Dificultad:** ⭐⭐⭐
+
+---
+
+# 🎯 **Lista recomendada final (5 bonus fáciles)**
+
+| Bonus              | Dificultad | Descripción                        | Por qué es fácil        |
+| ------------------ | ---------- | ---------------------------------- | ----------------------- |
+| **DNS Management** | ⭐         | Mostrar hostname con getnameinfo   | Función ya permitida    |
+| **-m <max_ttl>**   | ⭐         | Cambiar TTL máximo                 | Solo cambiar un número  |
+| **-q <nprobes>**   | ⭐⭐       | Cambiar número de probes por salto | Bucle ya existe         |
+| **-i <interval>**  | ⭐⭐       | Intervalo entre probes             | Añadir sleep            |
+| **-t <timeout>**   | ⭐⭐⭐     | Timeout configurable               | select() ya lo gestiona |
+
+---
+
+# 🧠 Bonus difíciles
+
+| Flag       | Dificultad | Motivo                                                           |
+| ---------- | ---------- | ---------------------------------------------------------------- |
+| `-p`, `-s` | 🔥         | Implica modificar puertos y sockets, puede romper compatibilidad |
+| `-l`       | 🔥         | Raw sockets diferentes, parsing más complejo                     |
+| `-N`       | 🔥🔥       | MPLS, ICMP Extensions, parsing complejo                          |
+| `-T`, `-U` | 🔥🔥🔥     | Cambiar de ICMP a TCP/UDP requiere otro tipo de socket           |
+
+---

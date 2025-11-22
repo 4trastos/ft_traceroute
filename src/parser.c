@@ -6,6 +6,9 @@ void    init_struct(struct config *conf)
     conf->show_version = false;
     conf->show_help = false;
     conf->max_ttl = true;
+    conf->nprobes = false;
+    conf->interval = false;
+    conf->timeout = false;
     conf->hostname = NULL;
     conf->sockfd = -1;
     conf->sequence = 0;
@@ -36,12 +39,42 @@ int ft_parser(struct config *conf, char **argv, int argc)
             else if (ft_strcmp(argv[i], "-m") == 0)
             {
                 x = i;
-                if (argv[i++] == NULL || (ft_atoi(argv[i++]) == 0))
+                if (argv[i + 1] == NULL || (ft_atoi(argv[i + 1]) == 0))
                 {
                     printf("Option `-m' (argc %d) requires an argument: `-m max_ttl'\n", x);
                     return (-1);
                 }
                 conf->max_ttl = false;
+            }
+            else if (ft_strcmp(argv[i], "-q") == 0)
+            {
+                x = i;
+                if (argv[i++] == NULL || (ft_atoi(argv[i++]) == 0))
+                {
+                    printf("Option `-q' (argc %d) requires an argument: `-q nqueries'\n", x);
+                    return (-1);
+                }
+                conf->nprobes = true;
+            }
+            else if (ft_strcmp(argv[i], "-i") == 0)
+            {
+                x = i;
+                if (argv[i++] == NULL || (ft_atoi(argv[i++]) == 0))
+                {
+                    printf("Option `-i' (argc %d) requires an argument: `-i device'\n", x);
+                    return (-1);
+                }
+                conf->interval = true;
+            }
+            else if (ft_strcmp(argv[i], "-t") == 0)
+            {
+                x = i;
+                if (argv[i++] == NULL || (ft_atoi(argv[i++]) == 0))
+                {
+                    printf("Option `-t' (argc %d) requires an argument: `-t tos'\n", x);
+                    return (-1);
+                }
+                conf->timeout = true;
             }
             else
             {
@@ -59,6 +92,8 @@ int ft_parser(struct config *conf, char **argv, int argc)
                 printf("%s: Error: Only one hostname is allowed\n", argv[0]);
                 return (-1);
             }
+            if (conf->max_ttl == true || conf->nprobes == true || conf->interval == true || conf->timeout == true)
+                i++;
             conf->hostname = argv[i];
         }
         i++;

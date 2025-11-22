@@ -48,6 +48,9 @@ struct config
     bool                show_help;
     bool                is_valid;
     bool                max_ttl;
+    bool                nprobes;
+    bool                interval;
+    bool                timeout;
     char                *hostname;
     int                 sockfd;
     int                 ttl;
