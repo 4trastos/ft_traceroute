@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 
     if (argc < 2)
     {
-        printf("%s: usage error: Destination address required \n", argv[0]);
+        show_help();
         return (1);
     }
     conf = malloc(sizeof(struct config));
@@ -17,6 +17,7 @@ int main(int argc, char **argv)
         return (1);
 
     init_signal();
+    conf->argc = argc;
     if (ft_parser(conf, argv, argc) != 0)
         exit = 1;
     if (conf->is_valid && (conf->show_help || conf->show_version))

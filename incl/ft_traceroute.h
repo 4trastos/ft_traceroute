@@ -44,16 +44,18 @@ struct ping_packet
 
 struct config
 {
+    char                *hostname;
+    char                *interface;
     bool                show_version;
     bool                show_help;
     bool                is_valid;
-    bool                max_ttl;
-    bool                nprobes;
-    bool                interval;
     bool                timeout;
-    char                *hostname;
+    int                 nprobes;
     int                 sockfd;
     int                 ttl;
+    int                 max_ttl;
+    int                 tos;
+    int                 argc;
     uint16_t            sequence;
     struct in_addr      ip_address;
     struct stats        stats;
@@ -68,6 +70,10 @@ int         main(int argc, char **argv);
 
 int         ft_strcmp(const char *s1, const char *s2);
 int         ft_atoi(char *str);
+int         ft_isdigit(int c);
+int         is_valid_number(char *str);
+int         is_valid_interface_name(char *name);
+int         ft_isalnum(int c);
 
 //*** Parser Logic***/
 
@@ -76,7 +82,10 @@ void        show_options(struct config *conf);
 void        show_help(void);
 void        show_version(void);
 int         ft_parser(struct config *conf, char **argv, int argc);
-int         parser_max_ttl(char **argv, int i, int x);
+int         parser_max_ttl(struct config *conf, char **argv, int argc, int i);
+int         parser_nprobes(struct config *conf, char **argv, int argc, int i);
+int         parser_device(struct config *conf, char **argv, int argc, int i);
+int         parser_tos(struct config *conf, char **argv, int argc, int i);
 
 //*** Signal Handler ***/
 

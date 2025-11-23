@@ -35,3 +35,49 @@ int ft_atoi(char *str)
     }
     return (result * neg);
 }
+
+int ft_isdigit(int c)
+{
+    if (c >= '0' && c <= '9')
+        return (1);
+    else
+        return (0);
+}
+
+int is_valid_number(char *str)
+{
+    int i;
+
+    i = 0;
+    if (!str || *str == '\0')
+        return (0);
+    while (str[i] != '\0')
+    {
+        if (!ft_isdigit(str[i]))
+            return (0);
+        i++;
+    }
+    return (1);
+}
+
+int is_valid_interface_name(char *name)
+{
+    int i = 0;
+
+    if (!name || *name == '\0')
+        return (0);
+    if (is_valid_number(name))
+        return (0);
+    while (name[i])
+    {
+        if (!ft_isalnum(name[i] || name[i] == '.' || name[i] == '_' || name[i] == '-'))
+            return (0);
+        i++;
+    }
+    return (1);
+}
+
+int ft_isalnum(int c)
+{
+    return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
+}
