@@ -8,7 +8,7 @@ int socket_creation(struct config *conf)
     if (conf->sockfd == -1)
     {
         printf("ft_traceroute: socket error: %s\n", strerror(errno));
-        return -1;
+        return (-1);
     }
 
     // Timeout de recepción
@@ -16,7 +16,7 @@ int socket_creation(struct config *conf)
     {
         printf("ft_traceroute: setsockopt (SO_RCVTIMEO) error: %s\n", strerror(errno));
         close(conf->sockfd);
-        return -1;
+        return (-1);
     }
 
 #ifdef SO_BINDTODEVICE
@@ -31,5 +31,5 @@ int socket_creation(struct config *conf)
         }
     }
 #endif
-    return 0;
+    return (0);
 }
