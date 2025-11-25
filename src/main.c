@@ -13,6 +13,7 @@ int main(int argc, char **argv)
 {
     struct config   *conf;
     int exit = 0;
+    unsigned char   *bytes;
 
     if (argc < 2)
     {
@@ -24,6 +25,7 @@ int main(int argc, char **argv)
         return (1);
 
     init_signal();
+    init_struct(conf);
     conf->argc = argc;
     if (ft_parser(conf, argv, argc) != 0)
         exit = 1;
@@ -34,8 +36,19 @@ int main(int argc, char **argv)
     }
     else if (dns_resolution(conf) != 0)
         exit = 1;
+    else if (socket_creation(conf) != 0)
+        exit = 1;
+    else
+    {
+        bytes = (unsigned char *)&conf->ip_address;
+        printf("traceroute to %s : (%d.%d.%d.%d), %d hops max\n", 
+            conf->hostname, bytes[0], bytes[1], bytes[2], bytes[3], 
+            conf->max_ttl);
 
-    printf("Hostname: ( %s )\n", conf->hostname);
+        if (send_socket(conf) != 0)
+            exit = 1;
+    }
+
     cleanup(conf);
     return (exit);
 }

@@ -2,24 +2,27 @@
 # define FT_TRACEROUTE_H
 
 # include <stdio.h>
-# include <unistd.h>
-# include <string.h>
 # include <stdlib.h>
+# include <string.h>
+# include <unistd.h>
 # include <signal.h>
 # include <stdbool.h>
+# include <limits.h>
+# include <arpa/inet.h>
+# include <fcntl.h>
 # include <errno.h>
 # include <sys/types.h>
 # include <sys/socket.h>
+# include <sys/time.h>
+# include <sys/un.h>
 # include <netdb.h>
 # include <netinet/in.h>
 # include <netinet/ip.h>
 # include <netinet/ip_icmp.h>
-# include <sys/time.h>
+# include <netinet/udp.h>
 # include <math.h>
 
-# define MAX_PACKETS 1024
-# define ICMP_PAYLOAD_SIZE 56
-# define MAX_TTL 30
+# define NI_MAXHOST 1025
 
 extern volatile sig_atomic_t g_sigint_received;
 
@@ -33,13 +36,6 @@ struct stats
     double              total_rtt;
     double              total_rtt_sq;
     struct timeval      start_time;
-};
-
-struct ping_packet
-{
-    struct icmphdr      icmp_header;
-    struct timeval      timestamp; 
-    char                data[ICMP_PAYLOAD_SIZE];
 };
 
 struct config
@@ -59,7 +55,6 @@ struct config
     uint16_t            sequence;
     struct in_addr      ip_address;
     struct stats        stats;
-    struct ping_packet  packets[MAX_PACKETS]; 
 };
 
 //*** Init Functions ***/
@@ -74,6 +69,9 @@ int         ft_isdigit(int c);
 int         is_valid_number(char *str);
 int         is_valid_interface_name(char *name);
 int         ft_isalnum(int c);
+void        *ft_memset(void *b, int c, size_t n);
+void        *ft_memcpy(void *dst, const void *src, size_t n);
+size_t      ft_strlen(char *str);
 
 //*** Parser Logic***/
 
@@ -96,16 +94,7 @@ void        init_signal(void);
 //*** Ping Logic ***/
 
 int         dns_resolution(struct config *conf);
-// int         socket_creation(struct config *conf);
-// int         icmp_creation(struct config *conf);
-// uint16_t    calculate_checksum(void *packet, size_t len);
-// int         send_socket(struct config *conf);
-// int         receive_response(struct config *conf);
-// double      calculate_rtt(struct ping_packet *sent_packet);
-
-//*** Statistics ***/
-
-// void        show_statistics(struct config *conf);
-// void        printf_verbose(struct config *conf);
+int         socket_creation(struct config *conf);
+int         send_socket(struct config *conf);
 
 #endif

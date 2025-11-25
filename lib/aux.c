@@ -81,3 +81,18 @@ int ft_isalnum(int c)
 {
     return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 }
+
+void    *ft_memset(void *b, int c, size_t n)
+{
+    unsigned char   *str;
+    size_t          i;
+
+    str = b;
+    i = 0;
+    while (i < n)
+    {
+        str[i] = (unsigned char)c;
+        i++;
+    }
+    return (b);
+}

@@ -9,10 +9,10 @@ void    init_struct(struct config *conf)
     conf->hostname = NULL;
     conf->sockfd = -1;
     conf->sequence = 0;
-    conf->ttl = 0;
+    conf->ttl = 64;
     conf->interface = NULL;
     conf->max_ttl = 30;
-    conf->nprobes = 30;
+    conf->nprobes = 3;
     conf->tos = 0;
 
     conf->stats.max_rtt = 0;
