@@ -340,8 +340,6 @@ Esperar X milisegundos entre probes.
 | `-N`       | 🔥🔥       | MPLS, ICMP Extensions, parsing complejo        |
 | `-T`, `-U` | 🔥🔥🔥     | Cambiar de ICMP a TCP/UDP requiere otro socket |
 
-Este es un excelente resumen de la lógica de tu `ft_traceroute`. A continuación, desglosaré paso a paso la función de cada segmento de código y estructura, explicando los detalles técnicos, los protocolos y el propósito de los *bonus* implementados.
-
 ---
 
 ## Análisis Detallado de `ft_traceroute`
