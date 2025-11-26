@@ -23,6 +23,8 @@
 # include <math.h>
 
 # define NI_MAXHOST 1025
+# define MIN_IP_HEADER_SIZE 20
+# define UDP_HEADER_SIZE 8
 
 extern volatile sig_atomic_t g_sigint_received;
 
@@ -34,6 +36,8 @@ struct config
     bool                show_help;
     bool                is_valid;
     bool                timeout;
+    int                 payload_size;
+    int                 packet_size;
     int                 nprobes;
     int                 sockfd;
     int                 ttl;

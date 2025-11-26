@@ -42,9 +42,7 @@ int main(int argc, char **argv)
     {
         bytes = (unsigned char *)&conf->ip_address;
         printf("traceroute to %s : (%d.%d.%d.%d), %d hops max, %d byte packets\n", 
-            conf->hostname, bytes[0], bytes[1], bytes[2], bytes[3], 
-            conf->max_ttl, conf->max_ttl);
-
+            conf->hostname, bytes[0], bytes[1], bytes[2], bytes[3], conf->max_ttl, conf->packet_size);
         if (send_socket(conf) != 0)
             exit = 1;
     }

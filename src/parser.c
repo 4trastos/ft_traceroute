@@ -14,6 +14,8 @@ void    init_struct(struct config *conf)
     conf->max_ttl = 30;
     conf->nprobes = 3;
     conf->tos = 0;
+    conf->payload_size = 32;
+    conf->packet_size = MIN_IP_HEADER_SIZE + UDP_HEADER_SIZE + conf->payload_size;
 }
 
 int ft_parser(struct config *conf, char **argv, int argc)
