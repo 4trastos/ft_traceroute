@@ -26,18 +26,6 @@
 
 extern volatile sig_atomic_t g_sigint_received;
 
-struct stats
-{
-    int                 send_packets;
-    int                 recieved_packets;
-    int                 total_ttl;
-    double              min_rtt;
-    double              max_rtt;
-    double              total_rtt;
-    double              total_rtt_sq;
-    struct timeval      start_time;
-};
-
 struct config
 {
     char                *hostname;
@@ -54,7 +42,6 @@ struct config
     int                 argc;
     uint16_t            sequence;
     struct in_addr      ip_address;
-    struct stats        stats;
 };
 
 //*** Init Functions ***/

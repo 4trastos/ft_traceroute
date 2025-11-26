@@ -66,12 +66,11 @@ int is_valid_interface_name(char *name)
 
     if (!name || *name == '\0')
         return (0);
-    if (is_valid_number(name))
-        return (0);
     while (name[i])
     {
-        if (!ft_isalnum(name[i] || name[i] == '.' || name[i] == '_' || name[i] == '-'))
+        if (!(ft_isalnum(name[i]) || name[i] == '.' || name[i] == '_' || name[i] == '-'))
             return (0);
+        
         i++;
     }
     return (1);

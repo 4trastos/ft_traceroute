@@ -14,15 +14,6 @@ void    init_struct(struct config *conf)
     conf->max_ttl = 30;
     conf->nprobes = 3;
     conf->tos = 0;
-
-    conf->stats.max_rtt = 0;
-    conf->stats.min_rtt= 0;
-    conf->stats.recieved_packets = 0;
-    conf->stats.send_packets = 0;
-    conf->stats.total_rtt= 0;
-    conf->stats.total_rtt_sq = 0;
-    conf->stats.total_ttl = 0;
-    gettimeofday(&conf->stats.start_time, NULL);
 }
 
 int ft_parser(struct config *conf, char **argv, int argc)
