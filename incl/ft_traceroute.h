@@ -80,7 +80,6 @@ int         parser_tos(struct config *conf, char **argv, int argc, int i);
 
 void        sigint_handler(int signum);
 void        init_signal(void);
-//void        sigalrm_handler(int signum);
 
 //*** Ping Logic ***/
 
