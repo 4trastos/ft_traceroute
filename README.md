@@ -339,3 +339,144 @@ Esperar X milisegundos entre probes.
 | `-l`       | 🔥         | Raw sockets diferentes, parsing complejo       |
 | `-N`       | 🔥🔥       | MPLS, ICMP Extensions, parsing complejo        |
 | `-T`, `-U` | 🔥🔥🔥     | Cambiar de ICMP a TCP/UDP requiere otro socket |
+
+
+***
+
+# Análisis Detallado del Proyecto ft\_traceroute
+
+Este es un excelente resumen de la lógica de tu `ft_traceroute`. A continuación, desglosaré paso a paso la función de cada segmento de código y estructura, explicando los detalles técnicos, los protocolos y el propósito de los *bonus* implementados.
+
+## Análisis Detallado de ft\_traceroute
+
+El programa `ft_traceroute` funciona esencialmente enviando paquetes UDP con un Time-To-Live (TTL) creciente y escuchando las respuestas ICMP generadas por los *routers* intermedios (`Time Exceeded`) o por el destino final (`Destination Unreachable`).
+
+---
+
+### 1. `main` (El Flujo Principal)
+
+La función `main` coordina toda la ejecución, desde la configuración inicial hasta el manejo de errores y la limpieza.
+
+#### Flujo de Ejecución:
+
+**Inicialización y `malloc`**
+:   Reserva memoria para la estructura `conf`, que centraliza todas las configuraciones y estados (destino, TTL máximo, número de sondas, sockets, etc.).
+
+**`init_signal()`**
+:   (Función no mostrada) Establece un *handler* para la señal **SIGINT** (Ctrl+C). Este *handler* simplemente pone la variable `g_sigint_received` a `1`. Esto permite una salida limpia del bucle principal de escaneo en lugar de terminar el programa inmediatamente.
+
+**`init_struct(conf)`**
+:   Inicializa todos los campos de `conf` a sus valores por defecto (ej. `max_ttl = 30`, `nprobes = 3`, `payload_size = 32`). Aquí se calcula `conf->packet_size` (generalmente $60 \text{ bytes}$) a partir de las cabeceras fijas y el *payload* por defecto.
+
+**`ft_parser(conf, argv, argc)`**
+:   Procesa los argumentos de la línea de comandos (`-m`, `-q`, `-i`, `-t`). Si encuentra errores (ej. argumento faltante o valor inválido), establece `exit = 1`. **Bonus implementado:** Manejo de opciones y sus argumentos.
+
+**`conf->show_help / conf->show_version`**
+:   Si el *parser* valida el comando y se solicitó ayuda o versión, se muestran y el programa finaliza sin necesidad de *sockets* ni DNS.
+
+**`dns_resolution(conf)`**
+:   (Función no mostrada) Resuelve el nombre de *host* proporcionado (ej. `google.es`) en una dirección IP numérica (`struct in_addr`), almacenando el resultado en `conf->ip_address`. Esto es esencial porque los *sockets* solo funcionan con direcciones numéricas.
+
+**`socket_creation(conf)`**
+:   Crea el *socket* de envío (UDP), explicado en detalle más adelante.
+
+**Impresión del Encabezado**
+:   Una vez que se tiene el *host* y la IP resuelta, se imprime la línea inicial: `traceroute to <hostname> (<IP>), <max_ttl> hops max, <packet_size> byte packets`.
+
+**`send_socket(conf)`**
+:   La lógica central del escaneo, explicada en detalle más adelante.
+
+**`cleanup(conf)`**
+:   Cierra el *socket* abierto (`conf->sockfd`) y libera la memoria reservada para la estructura `conf`, asegurando que no haya fugas de recursos.
+
+---
+
+### 2. `socket_creation` (Configurando el Socket de Envío)
+
+Esta función crea y configura el *socket* que se usará para enviar los paquetes UDP.
+
+#### Configuración del Socket:
+
+**`socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)`**
+:   Crea el *socket* principal de envío. El uso de: $\text{AF\_INET}$ (IPv4), $\text{SOCK\_DGRAM}$ (Datagrama, para UDP), e $\text{IPPROTO\_UDP}$ define el tipo de tráfico que se generará: paquetes UDP.
+
+**`setsockopt(..., SO_RCVTIMEO, ...)`**
+:   Establece un tiempo de espera de $4$ segundos para la recepción en este *socket*. Aunque la recepción ICMP se hace en un *socket* RAW separado, esta configuración es una buena práctica para el *socket* de envío UDP.
+
+**`#ifdef SO_BINDTODEVICE... (-i Bonus)`**
+:   **Bonus de Interfaz (`-i`):** Si la macro `SO_BINDTODEVICE` está definida (común en Linux) y el usuario especificó una interfaz (`conf->interface != NULL`), esta opción obliga a que los paquetes salientes usen **exclusivamente** la tarjeta de red especificada (ej. `eth0`, `wlan0`).
+
+---
+
+### 3. `send_socket` (El Corazón del Escaneo)
+
+Esta es la función más compleja y contiene el doble bucle principal (TTL y Sondas).
+
+#### 3.1. Preparación de Sockets y Bucle TTL
+
+**`recv_sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)`**
+:   Crea el *socket* de recepción. Debe ser un *socket* RAW porque el programa necesita leer los paquetes ICMP (errores de `Time Exceeded` o `Destination Unreachable`), que se encuentran por encima de la capa IP y no son gestionados por los *sockets* de alto nivel (como TCP o UDP). **Esto requiere permisos de administrador (`sudo`).**
+
+**`setsockopt(recv_sock, ..., SO_RCVTIMEO, ...)`**
+:   Establece un tiempo de espera de $1$ segundo para la recepción en este *socket* RAW. Si en $1$ segundo no llega una respuesta ICMP (del *router* o del destino), `recvfrom` fallará (`timeout`), y el programa imprimirá un `*`.
+
+**Bucle `for (ttl = 1; ttl <= conf->max_ttl ...)`**
+:   El bucle externo itera a través del **Time-To-Live**, incrementándolo en $1$ en cada paso. $\text{TTL} = 1$ va al primer *router*, $\text{TTL} = 2$ al segundo, y así sucesivamente, hasta alcanzar el destino o `conf->max_ttl` (por defecto $30$).
+
+**`setsockopt(conf->sockfd, IPPROTO_IP, IP_TTL, ...)`**
+:   **CRÍTICO:** Antes de cada salto, se establece el valor actual de $\text{TTL}$ en el *socket* UDP. Este es el mecanismo de `traceroute`: forzar la expiración del paquete en el *router* deseado para que este responda con un ICMP $\text{Time Exceeded}$.
+
+**`printf("%2d  ", ttl)`**
+:   Imprime el número de salto actual.
+
+#### 3.2. Bucle de Sondas (Probes) y Envío/Recepción
+
+**`in_addr_t last_ip = 0;`**
+:   Inicialización del *bonus* de multipath. Esta variable rastrea la dirección IP del último *router* que respondió en este salto (`ttl` actual).
+
+**Bucle `for (int probe = 0; probe < conf->nprobes ...)`**
+:   Bucle interno que itera sobre el número de sondas por salto (por defecto $3$, configurable con `-q`).
+
+**`dest.sin_port = htons(port + ttl);`**
+:   Se usa un puerto de destino que aumenta con el $\text{TTL}$ (ej. $33434 + \text{TTL}$). Este es el puerto inusual al que el programa intenta llegar. Cuando el paquete alcanza el destino final, el sistema operativo ve que ningún servicio usa ese puerto, y por convención, responde con un ICMP $\text{Destination Unreachable}$, que es la señal de terminación de `traceroute`.
+
+**`gettimeofday(&start, NULL);`**
+:   Marca el tiempo exacto antes de enviar la sonda.
+
+**`sendto(..., payload_data, conf->payload_size, ...)`**
+:   Envía el paquete UDP al destino, pero con el $\text{TTL}$ configurado para expirar en el *router* deseado. `conf->payload_size` asegura que se envíe la cantidad correcta de datos (por defecto $32 \text{ bytes}$).
+
+**`recvfrom(recv_sock, buffer, ...)`**
+:   Bloquea la ejecución, esperando la respuesta ICMP en el *socket* RAW. Si no llega nada en $1$ segundo (por el `timeout` configurado), falla.
+
+**Cálculo RTT**
+:   $\text{RTT}$ (Round Trip Time) es el tiempo transcurrido (en milisegundos) entre `start` y `end`.
+
+#### 3.3. Manejo de Multipath (Bonus)
+
+**`in_addr_t current_ip = recv_addr.sin_addr.s_addr;`**
+:   Captura la IP de origen del paquete ICMP de respuesta (es decir, la dirección del *router*).
+
+**`if (current_ip != last_ip)`**
+:   **Lógica de Impresión Multipath:** Si la IP de respuesta es diferente a la última IP impresa en este salto, significa que el paquete tomó un camino diferente (balanceo de carga o multipath).
+
+**`getnameinfo(...)`**
+:   Intenta resolver la dirección IP del *router* en un nombre de *host* (DNS inverso). Si tiene éxito, se imprime el nombre de *host* y la IP. Si falla, solo se imprime la IP.
+
+**`last_ip = current_ip;`**
+:   **Actualización:** Si se imprime una nueva IP, se actualiza `last_ip`. Si la IP es la misma, solo se imprime el $\text{RTT}$ sin la IP. Esto replica el comportamiento del `traceroute` estándar.
+
+#### 3.4. Detección de Destino Alcanzado
+
+**`struct iphdr *ip_hdr = ...`**
+:   El paquete ICMP recibido contiene el encabezado IP original del paquete que causó el error. Accedemos a la cabecera IP para saber su longitud.
+
+**`struct icmphdr *icmp_hdr = ...`**
+:   Accedemos a la cabecera ICMP.
+
+**`if (icmp_hdr->type == ICMP_DEST_UNREACH && icmp_hdr->code == ICMP_PORT_UNREACH)`**
+:   Esta es la condición de terminación. Un $\text{ICMP\_DEST\_UNREACH}$ con código $\text{PORT\_UNREACH}$ significa: "Llegué a la máquina de destino, pero el puerto de destino $33434+TTL$ no está abierto".
+
+**`ttl = conf->max_ttl; break;`**
+:   Si se alcanza el destino, se establece `ttl` al máximo para salir del bucle exterior después de esta sonda, finalizando la ejecución.
+```
