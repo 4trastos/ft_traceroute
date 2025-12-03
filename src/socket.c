@@ -2,7 +2,7 @@
 
 int socket_creation(struct config *conf)
 {
-    struct timeval timeout = {4, 0};
+    struct timeval timeout = {2, 0};
 
     conf->sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (conf->sockfd == -1)
