@@ -18,7 +18,7 @@ int dns_resolution(struct config *conf)
     if (status != 0)
     {
         printf("❌ Error: Obtaining the host: ( %s ) ❌\n", gai_strerror(status));
-        freeaddrinfo(result);
+        //freeaddrinfo(result);
         return (-1);
     }
 
