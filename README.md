@@ -416,3 +416,13 @@ Esta es la función más compleja y contiene el doble bucle principal (TTL y Son
 | **`struct icmphdr *icmp_hdr = ...`** | Accedemos a la cabecera ICMP. |
 | **`if (icmp_hdr->type == ICMP_DEST_UNREACH && icmp_hdr->code == ICMP_PORT_UNREACH)`** | Esta es la condición de terminación. Un `ICMP_DEST_UNREACH` con código $\text{PORT\_UNREACH}$ significa: "Llegué a la máquina de destino, pero el puerto de destino $33434+TTL$ no está abierto". |
 | **`ttl = conf->max_ttl; break;`** | Si se alcanza el destino, se establece `ttl` al máximo para salir del bucle exterior después de esta sonda, finalizando la ejecución. |
+
+
+```
+docker run -it --rm \
+  --cap-add=NET_RAW \
+  -v "$(pwd):/workspace" \
+  -w /workspace \
+  ubuntu:24.04 \
+  bash -c "apt update && apt install -y build-essential iproute2 traceroute nmap && bash"
+```

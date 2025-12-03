@@ -75,6 +75,7 @@ int         parser_max_ttl(struct config *conf, char **argv, int argc, int i);
 int         parser_nprobes(struct config *conf, char **argv, int argc, int i);
 int         parser_device(struct config *conf, char **argv, int argc, int i);
 int         parser_tos(struct config *conf, char **argv, int argc, int i);
+int         validate_icmp(unsigned char *buf, ssize_t len, struct in_addr dest_ip, uint16_t expected_port);
 
 //*** Signal Handler ***/
 
@@ -88,3 +89,4 @@ int         socket_creation(struct config *conf);
 int         send_socket(struct config *conf);
 
 #endif
+

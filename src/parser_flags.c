@@ -35,7 +35,7 @@ int parser_max_ttl(struct config *conf, char **argv, int argc, int i)
     }
 
     conf->max_ttl = ft_atoi(arg_value);
-    if (conf->max_ttl <= 0 || conf->max_ttl >= 255)
+    if (conf->max_ttl <= 0 || conf->max_ttl > 255)
     {
         printf("Invalid max TTL: %d. Must be between 1 and 255\n", conf->max_ttl);
         return (-1);
